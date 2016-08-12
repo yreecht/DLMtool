@@ -821,7 +821,8 @@ makePerf <- function(OMin, except=NULL) {
 # tests for errors to avoid crashes, and saves out resulting MSE object 
 runMSErobust <- function(OM = "1", MPs = NA, nsim = 200, proyears = 28, interval = 4, 
     pstar = 0.5, maxF = 0.8, timelimit = 1, reps = 1, custompars = 0, 
-    CheckMPs = TRUE, maxsims=64, name=NULL, maxCrash=10, saveMSE=TRUE, savePack=FALSE){
+    CheckMPs = TRUE, maxsims=64, name=NULL, maxCrash=10, saveMSE=TRUE, savePack=FALSE, 
+	SpatClose=FALSE){
 
   packets <- new('list')   # a list of completed MSE objects
   simsplit <- split(1:nsim, ceiling(seq_along(1:nsim)/maxsims)) # split the runs
@@ -846,7 +847,8 @@ runMSErobust <- function(OM = "1", MPs = NA, nsim = 200, proyears = 28, interval
     while(error==1 & crash <= maxCrash){
       trialMSE <- try(runMSE(OM=OM, MPs=MPs, nsim =length(simsplit[[i]]), 
 	  proyears=proyears, interval=interval, pstar=pstar, maxF=maxF, 
-	  timelimit=timelimit, reps=reps, custompars=custompars, CheckMPs=CheckMPs))
+	  timelimit=timelimit, reps=reps, custompars=custompars, CheckMPs=CheckMPs,
+	  SpatClose=SpatClose))
       crash <- crash + 1 
       if (crash >= maxCrash) stop("Crashed too many times!")	  
       if(class(trialMSE)=="MSE"){
