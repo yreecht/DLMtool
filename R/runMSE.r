@@ -5,7 +5,8 @@
 # Adrian Hordyk (a.hordyk@murdoch.edu.au)
 
 runMSE <- function(OM="1", MPs=NA, nsim=48, proyears=28, interval=4, pstar=0.5,
-                   maxF=0.8, timelimit=1, reps=1, custompars=0, CheckMPs=TRUE){ 
+                   maxF=0.8, timelimit=1, reps=1, custompars=0, CheckMPs=TRUE,
+				   SpatClose=FALSE){ 
   print("Loading operating model")
 
   flush.console()
@@ -634,7 +635,10 @@ runMSE <- function(OM="1", MPs=NA, nsim=48, proyears=28, interval=4, pstar=0.5,
       TACa[,mm,1] <- TACused
 	  
       fishdist<-(apply(VBiomass_P[,,1,],c(1,3),sum)^Spat_targ)/apply(apply(VBiomass_P[,,1,],c(1,3),sum)^Spat_targ,1,mean)   # spatial preference according to spatial biomass
-	  
+	  if (SpatClose) {
+	    fishdist[ , 1] <- 0 # No fishing in area 1   
+		fishdist[ , 2] <- 1	  
+	  }
       CB_P[SAYR]<-Biomass_P[SAYR]*(1-exp(-V_P[SAYt]*fishdist[SR]))      # ignore magnitude of effort or q increase (just get distribution across age and fishdist across space
 	  
       temp<-CB_P[,,1,]/apply(CB_P[,,1,],1,sum)   # how catches are going to be distributed
@@ -659,7 +663,11 @@ runMSE <- function(OM="1", MPs=NA, nsim=48, proyears=28, interval=4, pstar=0.5,
 	  
 	  newUppLim <- inc[7,,1]
 	  newVmax <- inc[8,,1]
-  
+  		  
+	  if (SpatClose) { # a permament spatial closure
+		Ai <- rep(0, nsim)
+		Si[,1] <- 0 
+	  }
 	  chngSel <- which(colSums(apply(newSel, 2, is.na))==0) # selectivity pattern changed 
 	  if (length(chngSel) > 0) {
 	    pL5[y+nyears,chngSel] <- newSel[1,chngSel]
@@ -851,7 +859,10 @@ runMSE <- function(OM="1", MPs=NA, nsim=48, proyears=28, interval=4, pstar=0.5,
           TACa[,mm,y]<-TACused
           MSElist[[mm]]@MPrec<-TACused
           fishdist<-(apply(VBiomass_P[,,y,],c(1,3),sum)^Spat_targ)/apply(apply(VBiomass_P[,,y,],c(1,3),sum)^Spat_targ,1,mean)   # spatial preference according to spatial biomass
-		  
+		  if (SpatClose) {
+	        fishdist[ , 1] <- 0 # No fishing in area 1   
+		    fishdist[ , 2] <- 1	  
+	      }
           CB_P[SAYR]<-Biomass_P[SAYR]*(1-exp(-V_P[SAYt]*fishdist[SR]))      # ignore magnitude of effort or q increase (just get distribution across age and fishdist across space
 		  
           temp<-CB_P[,,y,]/apply(CB_P[,,y,],1,sum)   # how catches are going to be distributed
@@ -876,7 +887,11 @@ runMSE <- function(OM="1", MPs=NA, nsim=48, proyears=28, interval=4, pstar=0.5,
 		  
 		  newUppLim <- inc[7,,1]
 		  newVmax <- inc[8,,1]
-
+		  
+		  if (SpatClose) { # a permament spatial closure
+		    Ai <- rep(0, nsim)
+			Si[,1] <- 0 
+		  }
 		  chngSel <- which(colSums(apply(newSel, 2, is.na))==0) # selectivity pattern changed 
 		  if (length(chngSel) >0) {
 		    pL5[y+nyears,chngSel] <- newSel[1,chngSel]
@@ -937,7 +952,11 @@ runMSE <- function(OM="1", MPs=NA, nsim=48, proyears=28, interval=4, pstar=0.5,
         MSElist[[mm]]@MPrec<-TACused		
       }else{ # not an update yr 
         vbio <- apply(VBiomass_P[,,y,],c(1,3),sum)
-        fishdist <- (vbio^Spat_targ)/apply(vbio^Spat_targ,1,mean) # calculate distribution of effort 	  
+        fishdist <- (vbio^Spat_targ)/apply(vbio^Spat_targ,1,mean) # calculate distribution of effort
+	    if (SpatClose) {
+	      fishdist[ , 1] <- 0 # No fishing in area 1   
+		  fishdist[ , 2] <- 1	  
+	    }		
         if(class(match.fun(MPs[mm]))=="DLM_output"){
           CB_P[SAYR]<-Biomass_P[SAYR]*(1-exp(-fishdist[SR]*V_P[SAYt]))      # ignore magnitude of effort or q increase (just get distribution across age and fishdist across space
           temp<-CB_P[,,y,]/apply(CB_P[,,y,],1,sum)   # how catches are going to be distributed
