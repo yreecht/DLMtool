@@ -855,7 +855,7 @@ plotFun <- function(class=c("MSE", "DLM_data"), msg=TRUE) {
   out <- sort(tt[which(p & p2)])
   out <- out[-grep("plotFun", out)]
   if (class=="MSE") {
-    out <- c(out, "barplot", "boxplot", "VOI", "VOI2")
+    out <- c(out, "barplot", "boxplot", "VOI", "VOI2", "CheckConverg")
 	out <- sort(out)
   }
   if (class=="DLM_data") {

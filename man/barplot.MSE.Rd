@@ -41,11 +41,11 @@ Optional subset MSE object by simulation
   \item{msg}{
 Logical. Print out messages?
 }
-\item{incRef}{Logical. Include the reference methods?}
-  \item{cex.names}{
+\item{cex.names}{
 Size of names
 }
-  \item{...}{
+\item{incRef}{Logical. Include the reference methods?}
+\item{...}{
 Optional additional arguments passed to \code{barplot}
 }
 }
