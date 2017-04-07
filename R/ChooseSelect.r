@@ -1,3 +1,4 @@
+
 #' Manually choose the historical selectivity pattern
 #' 
 #' Input the first historical year, and all years where selectivity pattern
@@ -8,7 +9,6 @@
 #' Selectivity-at-length is fixed in between break-point years.  Note that this
 #' function replaces 'nyears' in the Fleet object with the value defined here
 #' (FstYr:current year).
-#' 
 #' 
 #' @param Fleet A fleet object.
 #' @param Stock Optional Stock object. If provided, average length-at-maturity
@@ -169,10 +169,10 @@ BlankSelPlot <- function(Stock = NULL, Yr = NULL, N = NULL, isRel) {
     }
 }
 
-#' Internal function for mapping selectivity
-#'
-#' @author A. Hordyk
-#' @keywords internal
+# #' Internal function for mapping selectivity
+# #'
+# #' @author A. Hordyk
+# #' @keywords internal
 ChooseL5 <- function(Fleet, Stock, isRel) {
     if (isRel) {
         By <- 0.05
@@ -192,10 +192,10 @@ ChooseL5 <- function(Fleet, Stock, isRel) {
     L5out
 }
 
-#' Internal function for mapping selectivity
-#'
-#' @author A. Hordyk
-#' @keywords internal
+# #' Internal function for mapping selectivity
+# #'
+# #' @author A. Hordyk
+# #' @keywords internal
 ChooseLFS <- function(L5out, Fleet, Stock, isRel) {
     if (isRel) {
         Max <- 3
@@ -217,10 +217,10 @@ ChooseLFS <- function(L5out, Fleet, Stock, isRel) {
     LFSout
 }
 
-#' Internal function for mapping selectivity
-#'
-#' @author A. Hordyk
-#' @keywords internal
+# #' Internal function for mapping selectivity
+# #'
+# #' @author A. Hordyk
+# #' @keywords internal
 ChooseVmaxlen <- function(Fleet, Stock, isRel) {
     if (isRel) {
         Max <- 3
@@ -242,10 +242,10 @@ ChooseVmaxlen <- function(Fleet, Stock, isRel) {
     Vmaxout
 }
 
-#' Rough Plot of Historical Selectivity Patterns
-#'
-#' @author A. Hordyk
-#' @keywords internal
+# #' Rough Plot of Historical Selectivity Patterns
+# #'
+# #' @author A. Hordyk
+# #' @keywords internal
 CheckSelect <- function(Fleet, Stock = NULL) {
     # NEEDS TO BE FIXED
     if (length(Fleet@SelYears) < 1) 

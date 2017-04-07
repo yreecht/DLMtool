@@ -1518,7 +1518,8 @@ joinMSE <- function(MSEobjs = NULL) {
   lapply(MSEobjs, checkMSE) # check that MSE objects contains all slots 
   
   MPNames <- lapply(MSEobjs, getElement, name = "MPs")  # MPs in each object 
-  allsame <- length(unique(MPNames)) == 1
+  allsame <- length(unique(lapply(MPNames, unique))) == 1
+ 
   if (!allsame) {
     # drop the MPs that don't appear in all MSEobjs
     mpnames <- unlist(MPNames)
@@ -1776,8 +1777,8 @@ TradePlot <- function(MSEobj, XAxis = c("Overfishing", "Biomass:BMSY"),
   for (mm in 1:MSEobj@nMPs) {
     PNOF[mm] <- round(sum(MSEobj@F_FMSY[, mm, ] <= 1, na.rm = T)/prod(dim(MSEobj@F_FMSY[, 
       mm, ]), na.rm = T) * 100, 1)
-    BMSYref[mm] <- round(sum(MSEobj@B_BMSY[, mm, ] > BmsyRef, na.rm = T)/prod(dim(MSEobj@B_BMSY[, 
-      mm, ])) * 100, 1)
+    BMSYref[mm] <- round(sum(MSEobj@B_BMSY[, mm, ] > BmsyRef, na.rm = T)/prod(dim(MSEobj@B_BMSY[, mm, ])) * 100, 1)
+	
     B0ref[mm] <- round(sum((MSEobj@B_BMSY[, mm, ] * MSEobj@OM$SSBMSY_SSB0) > 
       B0Ref, na.rm = T)/prod(dim(MSEobj@B_BMSY[, mm, ])) * 100, 1)
     # LTY[mm]<-round(sum(MSEobj@C[,mm,yend]/RefYd>0.5,na.rm=T)/(MSEobj@nsim*length(yend)),3)*100
@@ -2384,18 +2385,19 @@ MPStats <- function(MSEobj, PMRefs = list(B_BMSY = 0.5, SSB_SSB0 = 0.2, F_FMSY =
   MSEobj@C[(!is.finite(MSEobj@C[, , , drop = FALSE]))] <- 0  # if catch is NAN or NA, make it 0
   aavy <- (((MSEobj@C[, , y1, drop = FALSE] - MSEobj@C[, , y2, drop = FALSE])/MSEobj@C[, 
     , y2, drop = FALSE])^2)^0.5
+
   aavy[is.nan(aavy)] <- NA
-  aavy[aavy == Inf] <- NA
-  aavy[aavy > 10 * median(aavy, na.rm = TRUE)] <- NA  # remove huge spikes from F=0
+  if (sum(aavy == Inf, na.rm=TRUE) > 0) aavy[aavy == Inf] <- NA
+  
+  # aavy[aavy > 10 * median(aavy, na.rm = TRUE)] <- NA  # remove huge spikes from F=0
   AAVYm <- apply(aavy, 2, sumFun, na.rm = TRUE)  # median/mean in last yrs
   
   AAVYsd <- apply(aavy, 2, sd, na.rm = TRUE)  # sd in last yrs
   AAVYref <- aavy < maxVar
-  AAVYp <- round(apply(AAVYref, 2, sum, na.rm = TRUE)/(lastYrs * nsim), 
-    2)
+  AAVYp <- round(apply(AAVYref, 2, sum, na.rm = TRUE)/(lastYrs * nsim),  2)
   
   # AAVE - Interannual varialility in effort
-  maxVar <- ifelse(trefs$AAVY > 1, trefs$AAVE/100, trefs$AAVE)
+  maxVar <- ifelse(trefs$AAVE > 1, trefs$AAVE/100, trefs$AAVE)
   eff <- MSEobj@Effort
   if (all(is.na(eff))) {
     message("Variability in effort unable to be calculated from this version of MSE object")
@@ -2410,7 +2412,7 @@ MPStats <- function(MSEobj, PMRefs = list(B_BMSY = 0.5, SSB_SSB0 = 0.2, F_FMSY =
       , y2 - 1, drop = FALSE])^2)^0.5
     aave[is.nan(aave)] <- NA
     aave[aave == Inf] <- NA
-    aave[aave > 10 * apply(aave, 2, median, na.rm = TRUE)] <- NA  # remove huge spikes from F=0
+    # aave[aave > 10 * apply(aave, 2, median, na.rm = TRUE)] <- NA  # remove huge spikes from F=0
     AAVEm <- apply(aave, 2, sumFun, na.rm = TRUE)  # median/mean in last yrs
     AAVEsd <- apply(aave, 2, sd, na.rm = TRUE)  # sd in last yrs
     AAVEref <- aave < maxVar
@@ -3718,7 +3720,7 @@ calcMSESense <- function(MP = 1, MSEobj, YVar = c("Y", "B"), Par = c("Obs",
   }
   
   # Operating Model names to include
-  MSEobj@OM$Lm_SL <- MSEobj@OM$LFS/MSEobj@OM$lenM
+  MSEobj@OM$Lm_SL <- MSEobj@OM$L50/MSEobj@OM$LFS
   varnames <- names(MSEobj@OM)
   vars <- MSEobj@OM
   vargood <- (apply(vars, 2, sd, na.rm = TRUE)/(apply(vars, 2, mean, 
