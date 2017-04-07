@@ -1480,9 +1480,25 @@ Sub <- function(MSEobj, MPs = NULL, sims = NULL, years = NULL) {
   } else {
     SubVB <- MSEobj@VB[SubIts, SubMPs, Years, drop = FALSE]
   }
-  
- 
-  
+
+  # check if slot exists
+  tt <- try(slot(MSEobj, "PopAS"), silent = TRUE)
+  if (class(tt) == "try-error") slot(MSEobj, "PopAS") <- array(NA)
+  if (all(is.na(MSEobj@PopAS))) {
+    SubPopAS <- array(NA)
+  } else {
+    SubPopAS <- MSEobj@PopAS[SubIts, SubMPs, , Years, drop = FALSE]
+  }
+
+  # check if slot exists
+  tt <- try(slot(MSEobj, "CatchAS"), silent = TRUE)
+  if (class(tt) == "try-error") slot(MSEobj, "CatchAS") <- array(NA)
+  if (all(is.na(MSEobj@CatchAS))) {
+    SubCatchAS <- array(NA)
+  } else {
+    SubCatchAS <- MSEobj@CatchAS[SubIts, SubMPs, , Years, drop = FALSE]
+  }
+    
   SubResults <- new("MSE", Name = MSEobj@Name, nyears = MSEobj@nyears, 
     proyears = MSEobj@proyears, nMPs = length(SubMPs), MPs = newMPs, 
     nsim = length(SubIts), OM = OutOM, Obs = MSEobj@Obs[SubIts, , drop = FALSE],
@@ -1491,7 +1507,7 @@ Sub <- function(MSEobj, MPs = NULL, sims = NULL, years = NULL) {
 	TAC = SubTACa, SSB_hist = MSEobj@SSB_hist[SubIts, , , , drop = FALSE], 
 	CB_hist = MSEobj@CB_hist[SubIts, , , , drop = FALSE], 
 	FM_hist = MSEobj@FM_hist[SubIts, , , , drop = FALSE], 
-    Effort = SubEffort)
+    Effort = SubEffort, PopAS = SubPopAS, CatchAS = SubCatchAS)
   
   return(SubResults)
 }
@@ -1605,7 +1621,7 @@ joinMSE <- function(MSEobjs = NULL) {
     Obs = outlist$Obs, B_BMSY = outlist$B_BMSY, F_FMSY = outlist$F_FMSY, 
     outlist$B, outlist$SSB, outlist$VB,
 	outlist$FM, outlist$C, outlist$TAC, outlist$SSB_hist, 
-    outlist$CB_hist, outlist$FM_hist, outlist$Effort)
+    outlist$CB_hist, outlist$FM_hist, outlist$Effort, outlist$PopAS, outlist$CatchAS)
   
   newMSE
 }

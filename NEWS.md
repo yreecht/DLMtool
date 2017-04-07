@@ -3,6 +3,11 @@ The current version of the DLMtool package is available for download from [CRAN]
 
 ### DLMtool V3.2.3
 
+NEW STUFF - 
+Added age structure to MSE object 
+- might need to add length structure
+- possibly refine names 
+
 #### Major Changes
 - all objects previously in `DLMdat` have now been added as separate data objects. This means that it is no longer neccessary to unpack data objects at the beginning of an R session.
 - parallel processing can be initialized with a new function `setup()`

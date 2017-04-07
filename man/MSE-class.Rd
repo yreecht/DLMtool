@@ -111,7 +111,9 @@ simulation conditions and performance of data-limited methods
 
 \item{\code{Effort}}{Stored relative fishing effort in the projection years}
 
-\item{\code{Extra}}{A list for additional information}
+\item{\code{PopAS}}{Stored age structure of population (nsim, nMPs, nages, proyears)}
+
+\item{\code{CatchAS}}{Stored age structure of catch (nsim, nMPs, nages, proyears)}
 }}
 
 \section{Objects from the Class}{

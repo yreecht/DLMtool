@@ -319,7 +319,7 @@ runMSE <- function(OM = "1", MPs = NA, nsim = 48, proyears = 28, interval = 4,
   ind <- as.matrix(expand.grid(1:nsim, 1:maxage, 1:(nyears + proyears)))  # an index for calculating Length at age
   Len_age[ind] <- Linfarray[ind[, c(1, 3)]] * (1 - exp(-Karray[ind[, c(1, 3)]] * 
     (Agearray[ind[, 1:2]] - t0[ind[, 1]])))
-  if (!exists("Wt_age", inherits=FALSE)| is.null(custompars)) {
+  if (!exists("Wt_age", inherits=FALSE) | is.null(custompars)) {
     Wt_age <- array(NA, dim = c(nsim, maxage, nyears + proyears))  # Weight at age array
     Wt_age[ind] <- OM@a * Len_age[ind]^OM@b  # Calculation of weight array
   }	
@@ -1016,6 +1016,8 @@ runMSE <- function(OM = "1", MPs = NA, nsim = 48, proyears = 28, interval = 4,
   TACa <- array(NA, dim = c(nsim, nMP, proyears))  # store the projected TAC recommendation
   Effort <- array(NA, dim = c(nsim, nMP, proyears))  # store the Effort
   # SPRa <- array(NA,dim=c(nsim,nMP,proyears)) # store the Spawning Potential Ratio
+  PopAS <- array(NA, dim = c(nsim, nMP, maxage, proyears))  # store the projected population age structured
+  CatchAS <- array(NA, dim = c(nsim, nMP, maxage, proyears))  # store the projected catch age structured 
   
   MPdur <- rep(NA, nMP)
   mm <- 1 # for debugging
@@ -1562,6 +1564,11 @@ runMSE <- function(OM = "1", MPs = NA, nsim = 48, proyears = 28, interval = 4,
     # VBiomass is calculated before catches are taken 				   
 	
     Ca[, mm, ] <- apply(CB_P, c(1, 3), sum, na.rm=TRUE)
+	
+	# Population and Catch Age Structure - summed across areas
+	PopAS[, mm, , ] <- apply(N_P, c(1, 2, 3), sum) # nsim, maxage, proyears
+	CNtemp <- array(N_P * exp(Z_P) * (1 - exp(-Z_P)) * (FM_P/Z_P), c(nsim, maxage, proyears, nareas))
+	CatchAS[ , mm, , ] <- apply(CNtemp, c(1, 2, 3), sum) # nsim, maxage, proyears
     cat("\n")
   }  # end of mm methods
 
@@ -1571,8 +1578,10 @@ runMSE <- function(OM = "1", MPs = NA, nsim = 48, proyears = 28, interval = 4,
   MSEout <- new("MSE", Name = OM@Name, nyears, proyears, nMPs=nMP, MPs, nsim, 
     DLM_data@OM, Obs=DLM_data@Obs, B_BMSY=B_BMSYa, F_FMSY=F_FMSYa, B=Ba, 
 	SSB=SSBa, VB=VBa, FM=FMa, Ca, TAC=TACa, SSB_hist = SSB, CB_hist = CB, 
-	FM_hist = FM, Effort = Effort)
-    # Store MSE info
+	FM_hist = FM, Effort = Effort, PopAS = PopAS, CatchAS=CatchAS)
+  
+  # add length structure   
+  # Store MSE info
   attr(MSEout, "version") <- packageVersion("DLMtool")
   attr(MSEout, "interval") <- interval
   attr(MSEout, "maxF") <- maxF
@@ -1584,6 +1593,4 @@ runMSE <- function(OM = "1", MPs = NA, nsim = 48, proyears = 28, interval = 4,
   MSEout 
   
 }
-
-
 
